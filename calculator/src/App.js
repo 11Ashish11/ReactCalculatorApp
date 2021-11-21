@@ -1,8 +1,9 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { useReducer } from 'react';
 import "./styles.css";
+import DigitFunction from './DigitFunction';
 
-const ACTION_TYPES = {
+export const ACTION_TYPES = {
   ADD: 'ADD',
   SUBTRACT: 'SUBTRACT',
   MULTIPLY: 'MULTIPLY',
@@ -16,8 +17,8 @@ function reducer(state, {type, payload} ) {
     case ACTION_TYPES.ADD:
       return {
         ...state,
-        currentOperand: `${currentOperand}${payload.digit}`
-}
+        currentOperand: `${state.currentOperand || '' }${payload.digit}`
+      }
   }
 }
 
@@ -25,7 +26,8 @@ function reducer(state, {type, payload} ) {
 function App() {
 
   const [{currentOperand, previousOperand, operation}, dispatch] = useReducer(reducer, {})
-  dispatch({type: ACTION_TYPES.ADD, payload: {digit: '1'}})
+  // dispatch({type: ACTION_TYPES.ADD, payload: {digit: 1 }})
+
   return (
     <div className="calculator-grid">
       <div className="output">
@@ -35,22 +37,38 @@ function App() {
       <button className="span-two"> AC </button>
       <button> DEL </button>
       <button> ÷ </button>
-      <button> 1 </button>
-      <button> 2 </button>
-      <button> 3 </button>
-      <button> + </button>
-      <button> 4 </button>
-      <button> 5 </button>
-      <button> 6 </button>
+      <DigitFunction digit= "1" dispatch={dispatch} />
+      <DigitFunction digit= "2" dispatch={dispatch} />
+      <DigitFunction digit= "3" dispatch={dispatch} />
+      <button> × </button>
+      <DigitFunction digit= "4" dispatch={dispatch} />
+      <DigitFunction digit= "5" dispatch={dispatch} />
+      <DigitFunction digit= "6" dispatch={dispatch} />
       <button> - </button>
-      <button> 7 </button>
-      <button> 8 </button>
-      <button> 9 </button>
-      <button> x </button>
-      <button> 0 </button>
+      <DigitFunction digit= "7" dispatch={dispatch} />
+      <DigitFunction digit= "8" dispatch={dispatch} />
+      <DigitFunction digit= "9" dispatch={dispatch} />
+      <button> + </button>
       <button> . </button>
+      <DigitFunction digit= "0" dispatch={dispatch} />
       <button className="span-two"> = </button>
     </div>
+      // <button> 1 </button>
+      // <button> 2 </button>
+      // <button> 3 </button>
+      // <button> + </button>
+      // <button> 4 </button>
+      // <button> 5 </button>
+      // <button> 6 </button>
+      // <button> - </button>
+      // <button> 7 </button>
+      // <button> 8 </button>
+      // <button> 9 </button>
+      // <button> x </button>
+      // <button> 0 </button>
+      // <button> . </button>
+    //   <button className="span-two"> = </button>
+    // </div>
   );
 }
 
