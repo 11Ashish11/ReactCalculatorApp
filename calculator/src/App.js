@@ -6,11 +6,9 @@ import OperationButton from './OperationButton';
 
 export const ACTION_TYPES = {
   ADD: 'ADD',
-  SUBTRACT: 'SUBTRACT',
-  MULTIPLY: 'MULTIPLY',
-  DIVIDE: 'DIVIDE',
   CHOOSE_OPERATION: "choose-operation",
   CLEAR: 'CLEAR',
+  DELETE: 'delete',
   EVALUATE: 'EVALUATE',
 }
 
@@ -25,30 +23,70 @@ function reducer(state, {type, payload} ) {
           return state;
         }
       }
-
       return {
         ...state,
         currentOperand: `${state.currentOperand || '' }${payload.digit}`
       }
+
     case ACTION_TYPES.CHOOSE_OPERATION :
-      if(state.currentOperand === "" && state.previousOperand === "") {
+      if(state.currentOperand == null && state.previousOperand == null) {
         return state;
       }
-      if(state.previousOperand === null) {
+
+      if( state.currentOperand == null) {
+        return {
+          ...state,
+          operation: payload.operation,
+        }
+      }
+
+      if(state.previousOperand == null) {
         return {
           ...state,
           previousOperand: state.currentOperand,
-          currentOperand: "",
+          currentOperand: null,
           operation: payload.operation
         }
       }
+
       return {
         ...state,
         previousOperand: evaluate(state),
         operation: payload.operation,
-        currentOperand: null
-      } 
+        currentOperand: null,
+      }
 
+    case ACTION_TYPES.DELETE:
+      if(state.currentOperand == null) {
+        return state;
+      }
+      if(state.currentOperand.length === 1) {
+        return {
+          ...state,
+          currentOperand: null
+        }
+      }
+      return {
+        ...state,
+        currentOperand: state.currentOperand.slice(0, -1)
+      }
+
+    case ACTION_TYPES.CLEAR : 
+      return {}
+
+    
+    case ACTION_TYPES.EVALUATE :
+      if(state.operation == null || state.previousOperand == null || state.currentOperand == null) {
+        return state;
+      }
+
+
+      return {
+        ...state,
+        previousOperand: null,
+        currentOperand: evaluate(state),
+        operation: null,
+      }
   }
 }
 
@@ -61,13 +99,13 @@ function evaluate( {currentOperand, previousOperand, operation} ) {
   }
   switch(operation) {
     case "+" :
-      return prev + curr;
+      return (prev + curr).toString();
     case "-":
-      return prev - curr;
-    case "*":
-      return prev * curr;
+      return (prev - curr).toString();
+    case "x":
+      return (prev * curr).toString();
     case "÷":
-      return prev / curr;
+      return (prev / curr).toString();
   }
 }
 
@@ -75,8 +113,6 @@ function evaluate( {currentOperand, previousOperand, operation} ) {
 function App() {
 
   const [{currentOperand, previousOperand, operation}, dispatch] = useReducer(reducer, {})
-  // dispatch({type: ACTION_TYPES.ADD, payload: {digit: 1 }})
-
   return (
     <div className="calculator-grid">
       <div className="output">
@@ -85,30 +121,32 @@ function App() {
       </div>
       <button className="span-two"
         onClick={() => dispatch({type: ACTION_TYPES.CLEAR })} > AC </button>
-      <OperationButton operation={ACTION_TYPES.CLEAR} operation="DEL" />
-      <OperationButton operation={ACTION_TYPES.DIVIDE} operation="÷" />
+      <button onClick={() => dispatch({type: ACTION_TYPES.DELETE})}>
+        DEL
+      </button>
+      <OperationButton dispatch={dispatch} operation="÷" />
   
       <DigitFunction digit= "1" dispatch={dispatch} />
       <DigitFunction digit= "2" dispatch={dispatch} />
       <DigitFunction digit= "3" dispatch={dispatch} />
       
-      <OperationButton operation={ACTION_TYPES.MULTIPLY} operation="x" />
+      <OperationButton dispatch={dispatch} operation="x" />
 
       <DigitFunction digit= "4" dispatch={dispatch} />
       <DigitFunction digit= "5" dispatch={dispatch} />
       <DigitFunction digit= "6" dispatch={dispatch} />
       
-      <OperationButton operation={ACTION_TYPES.SUBTRACT} operation="-" />
+      <OperationButton dispatch={dispatch} operation="-" />
 
       <DigitFunction digit= "7" dispatch={dispatch} />
       <DigitFunction digit= "8" dispatch={dispatch} />
       <DigitFunction digit= "9" dispatch={dispatch} />
       
-      <OperationButton operation={ACTION_TYPES.ADD} operation="+" />
+      <OperationButton dispatch={dispatch} operation="+" />
 
       <DigitFunction digit= "." dispatch={dispatch} />
       <DigitFunction digit= "0" dispatch={dispatch} />
-      <button className="span-two"> = </button>
+      <button className="span-two" onClick={() => dispatch({type: ACTION_TYPES.EVALUATE})}> = </button>
 
     </div>
   );
